@@ -16,35 +16,57 @@
       font-size: 20px;
       font-weight: bold;
       margin-bottom: 20px;
+      text-align: center;
     }
 
     .container {
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: 30px;
-      max-width: 400px;
-      margin: auto;
+      max-width: 100%;
     }
 
     .row {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 5px 0;
     }
 
     input {
-      width: 30%;
-      font-size: 28px;
+      width: 64px;
+      font-size: 36px;
       text-align: center;
       border: none;
-      border-bottom: 2px solid #000;
-      outline: none;
+      background: none;
       color: #007bff;
       font-weight: bold;
+      outline: none;
+    }
+
+    .label {
+      font-size: 20px;
+      font-weight: bold;
+      color: black;
     }
 
     .result {
       text-align: center;
-      font-size: 36px;
+      font-size: 30px;
       line-height: 1.5;
       font-weight: bold;
     }
@@ -63,9 +85,19 @@
 
   <div class="container">
     <div class="row">
-      <input id="minutes" type="number" value="4" />
-      <input id="seconds" type="number" value="15" />
-      <input id="distance" type="number" value="200" />
+      <div class="input-group">
+        <input id="minutes" type="text" inputmode="numeric" pattern="\d*" value="4" />
+        <span class="label">мин</span>
+      </div>
+      <div class="input-group">
+        <input id="seconds" type="text" inputmode="numeric" pattern="\d*" value="15" />
+        <span class="label">с</span>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <input id="distance" type="text" inputmode="numeric" pattern="\d*" value="200" />
+      <span class="label">м</span>
     </div>
 
     <div class="result">
