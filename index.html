@@ -34,12 +34,6 @@
       flex-wrap: wrap;
     }
 
-    .column {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
     .input-group {
       display: flex;
       align-items: center;
@@ -48,7 +42,6 @@
     }
 
     input {
-      width: 64px;
       font-size: 36px;
       text-align: center;
       border: none;
@@ -56,12 +49,23 @@
       color: #007bff;
       font-weight: bold;
       outline: none;
+      width: 80px;
     }
 
     .label {
       font-size: 20px;
       font-weight: bold;
       color: black;
+    }
+
+    .unit-button {
+      font-size: 20px;
+      font-weight: bold;
+      color: black;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
     }
 
     .result {
@@ -96,8 +100,8 @@
     </div>
 
     <div class="input-group">
-      <input id="distance" type="text" inputmode="numeric" pattern="\d*" value="200" />
-      <span class="label">м</span>
+      <input id="distance" type="text" inputmode="decimal" pattern="\d*" value="1.00" />
+      <button id="unitToggle" class="unit-button">км</button>
     </div>
 
     <div class="result">
@@ -110,31 +114,58 @@
     var minutes = document.getElementById("minutes");
     var seconds = document.getElementById("seconds");
     var distance = document.getElementById("distance");
+    var unitToggle = document.getElementById("unitToggle");
     var speedOut = document.getElementById("speedOut");
     var paceOut = document.getElementById("paceOut");
+
+    var currentUnit = "km"; // по умолчанию теперь км
+
+    function getDistanceInMeters() {
+      var value = parseFloat(distance.value) || 0;
+      return currentUnit === "m" ? value : value * 1000;
+    }
 
     function updateFromTime() {
       var min = parseFloat(minutes.value) || 0;
       var sec = parseFloat(seconds.value) || 0;
-      var dist = parseFloat(distance.value);
+      var distMeters = getDistanceInMeters();
 
-      if (dist > 0 && (min > 0 || sec > 0)) {
+      if (distMeters > 0 && (min > 0 || sec > 0)) {
         var totalSeconds = min * 60 + sec;
         var hours = totalSeconds / 3600;
-        var km = dist / 1000;
+        var km = distMeters / 1000;
         var kmph = km / hours;
         var paceSecPerKm = totalSeconds / km;
         var paceMin = Math.floor(paceSecPerKm / 60);
         var paceSec = Math.round(paceSecPerKm % 60).toString().padStart(2, "0");
 
-        speedOut.innerText = kmph.toFixed(1);
+        speedOut.innerText = Math.round(kmph); // округляем до целого
         paceOut.innerText = paceMin + "." + paceSec;
       }
+    }
+
+    function toggleUnit() {
+      var value = parseFloat(distance.value) || 0;
+
+      if (currentUnit === "m") {
+        // Переключаем на км
+        distance.value = (value / 1000).toFixed(2);
+        currentUnit = "km";
+        unitToggle.innerText = "км";
+      } else {
+        // Переключаем на м
+        distance.value = Math.round(value * 1000);
+        currentUnit = "m";
+        unitToggle.innerText = "м";
+      }
+
+      updateFromTime();
     }
 
     minutes.addEventListener("input", updateFromTime);
     seconds.addEventListener("input", updateFromTime);
     distance.addEventListener("input", updateFromTime);
+    unitToggle.addEventListener("click", toggleUnit);
 
     window.addEventListener("DOMContentLoaded", function () {
       updateFromTime();
