@@ -42,7 +42,7 @@
     }
 
     input {
-      font-size: 40px;
+      font-size: 36px;
       text-align: center;
       border: none;
       background: none;
@@ -52,10 +52,15 @@
       width: 80px;
     }
 
+    input:placeholder-shown {
+      color: #ccc;
+    }
+
     .label {
       font-size: 20px;
       font-weight: bold;
       color: black;
+      margin-left: -4px;
     }
 
     .unit-button {
@@ -77,83 +82,100 @@
 
     .blue {
       color: #007bff;
+      font-size: 60px;
     }
 
     .black {
       color: #000;
+      font-size: 24px;
+      margin-left: 4px;
+      position: relative;
+      top: -10px;
     }
   </style>
 </head>
 <body>
-  <h1>🏃‍♂ RUN</h1>
+  <h1>🏃‍♂️ RUN</h1>
 
   <div class="container">
     <div class="row">
       <div class="input-group">
-        <input id="minutes" type="text" inputmode="numeric" pattern="\d*" value="4" />
+        <input id="minutes" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
         <span class="label">мин</span>
       </div>
       <div class="input-group">
-        <input id="seconds" type="text" inputmode="numeric" pattern="\d*" value="15" />
+        <input id="seconds" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
         <span class="label">с</span>
       </div>
     </div>
 
     <div class="input-group">
-      <input id="distance" type="text" inputmode="decimal" pattern="\d*" value="1" />
+      <input id="distance" type="text" inputmode="decimal" pattern="\d*" placeholder="0" />
       <button id="unitToggle" class="unit-button">км</button>
     </div>
 
     <div class="result">
-      <div><span class="blue" id="speedOut">–</span> <span class="black">км/ч</span></div>
-      <div><span class="blue" id="paceOut">–</span> <span class="black">мин/км</span></div>
+      <div>
+        <span class="blue" id="speedOut">–</span>
+        <span class="black">км/ч</span>
+      </div>
+      <div>
+        <span class="blue" id="paceOut">–</span>
+        <span class="black">мин/км</span>
+      </div>
     </div>
   </div>
 
   <script>
-    var minutes = document.getElementById("minutes");
-    var seconds = document.getElementById("seconds");
-    var distance = document.getElementById("distance");
-    var unitToggle = document.getElementById("unitToggle");
-    var speedOut = document.getElementById("speedOut");
-    var paceOut = document.getElementById("paceOut");
+    const minutes = document.getElementById("minutes");
+    const seconds = document.getElementById("seconds");
+    const distance = document.getElementById("distance");
+    const unitToggle = document.getElementById("unitToggle");
+    const speedOut = document.getElementById("speedOut");
+    const paceOut = document.getElementById("paceOut");
 
-    var currentUnit = "km"; // по умолчанию теперь км
+    let currentUnit = "km"; // По умолчанию километры
+    distance.value = "1";
+
+    function getInputValue(input) {
+      return parseFloat(input.value) || 0;
+    }
 
     function getDistanceInMeters() {
-      var value = parseFloat(distance.value) || 0;
+      const value = getInputValue(distance);
       return currentUnit === "m" ? value : value * 1000;
     }
 
     function updateFromTime() {
-      var min = parseFloat(minutes.value) || 0;
-      var sec = parseFloat(seconds.value) || 0;
-      var distMeters = getDistanceInMeters();
+      const min = getInputValue(minutes);
+      const sec = getInputValue(seconds);
+      const distMeters = getDistanceInMeters();
 
       if (distMeters > 0 && (min > 0 || sec > 0)) {
-        var totalSeconds = min * 60 + sec;
-        var hours = totalSeconds / 3600;
-        var km = distMeters / 1000;
-        var kmph = km / hours;
-        var paceSecPerKm = totalSeconds / km;
-        var paceMin = Math.floor(paceSecPerKm / 60);
-        var paceSec = Math.round(paceSecPerKm % 60).toString().padStart(2, "0");
+        const totalSeconds = min * 60 + sec;
+        const hours = totalSeconds / 3600;
+        const km = distMeters / 1000;
+        const kmph = km / hours;
+        const paceSecPerKm = totalSeconds / km;
+        const paceMin = Math.floor(paceSecPerKm / 60);
+        const paceSec = Math.round(paceSecPerKm % 60).toString().padStart(2, "0");
 
-        speedOut.innerText = Math.round(kmph); // округляем до целого
-        paceOut.innerText = paceMin + "." + paceSec;
+        speedOut.innerText = Math.round(kmph); // округление до целого
+        paceOut.innerText = `${paceMin}.${paceSec}`;
+      } else {
+        speedOut.innerText = "–";
+        paceOut.innerText = "–";
       }
     }
 
     function toggleUnit() {
-      var value = parseFloat(distance.value) || 0;
+      const value = getInputValue(distance);
 
       if (currentUnit === "m") {
-        // Переключаем на км
-        distance.value = (value / 1000).toFixed(2);
+        distance.value = String((value / 1000).toFixed(2)).replace(/\.00$/, "");
         currentUnit = "km";
         unitToggle.innerText = "км";
       } else {
-        // Переключаем на м
         distance.value = Math.round(value * 1000);
         currentUnit = "m";
         unitToggle.innerText = "м";
@@ -167,7 +189,7 @@
     distance.addEventListener("input", updateFromTime);
     unitToggle.addEventListener("click", toggleUnit);
 
-    window.addEventListener("DOMContentLoaded", function () {
+    window.addEventListener("DOMContentLoaded", () => {
       updateFromTime();
     });
   </script>
