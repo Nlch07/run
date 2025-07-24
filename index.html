@@ -42,14 +42,14 @@
     }
 
     input {
-      font-size: 36px;
+      font-size: 60px;
       text-align: center;
       border: none;
       background: none;
       color: #007bff;
       font-weight: bold;
       outline: none;
-      width: 85px;
+      width: 90px;
     }
 
     input:placeholder-shown {
@@ -57,14 +57,14 @@
     }
 
     .label {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: bold;
       color: black;
       margin-left: -4px;
     }
 
     .unit-button {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: bold;
       color: black;
       background: none;
@@ -100,17 +100,17 @@
   <div class="container">
     <div class="row">
       <div class="input-group">
-        <input id="minutes" type="text" inputmode="numeric" pattern="\d*" placeholder="4" />
+        <input id="minutes" type="text" inputmode="numeric" pattern="\d*" value="4" placeholder="0" />
         <span class="label">мин</span>
       </div>
       <div class="input-group">
-        <input id="seconds" type="text" inputmode="numeric" pattern="\d*" placeholder="15" />
+        <input id="seconds" type="text" inputmode="numeric" pattern="\d*" value="15" placeholder="0" />
         <span class="label">с</span>
       </div>
     </div>
 
     <div class="input-group">
-      <input id="distance" type="text" inputmode="decimal" pattern="\d*" placeholder="0" />
+      <input id="distance" type="text" inputmode="decimal" pattern="\d*" value="1" placeholder="0" />
       <button id="unitToggle" class="unit-button">км</button>
     </div>
 
@@ -135,7 +135,6 @@
     const paceOut = document.getElementById("paceOut");
 
     let currentUnit = "km"; // По умолчанию километры
-    distance.value = "1";
 
     function getInputValue(input) {
       return parseFloat(input.value) || 0;
@@ -160,7 +159,7 @@
         const paceMin = Math.floor(paceSecPerKm / 60);
         const paceSec = Math.round(paceSecPerKm % 60).toString().padStart(2, "0");
 
-        speedOut.innerText = Math.round(kmph); // округление до целого
+        speedOut.innerText = Math.round(kmph); // округляем
         paceOut.innerText = `${paceMin}.${paceSec}`;
       } else {
         speedOut.innerText = "–";
@@ -184,11 +183,13 @@
       updateFromTime();
     }
 
+    // Обновление при вводе
     minutes.addEventListener("input", updateFromTime);
     seconds.addEventListener("input", updateFromTime);
     distance.addEventListener("input", updateFromTime);
     unitToggle.addEventListener("click", toggleUnit);
 
+    // Автоматический расчет при загрузке
     window.addEventListener("DOMContentLoaded", () => {
       updateFromTime();
     });
