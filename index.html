@@ -3,46 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RUN Калькулятор</title>
+  <title>RUN</title>
   <style>
     body {
+      background: white;
       font-family: sans-serif;
-      background-color: white;
+      margin: 0;
       padding: 20px;
-      color: black;
     }
+
     h1 {
-      font-size: 1.5rem;
+      font-size: 20px;
       font-weight: bold;
+      margin-bottom: 20px;
     }
+
     .container {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 30px;
       max-width: 400px;
       margin: auto;
     }
+
     .row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
     }
+
     input {
-      width: 100px;
-      padding: 8px;
-      font-size: 1.2rem;
+      width: 30%;
+      font-size: 28px;
       text-align: center;
-      border: 2px solid #ccc;
-      border-radius: 8px;
+      border: none;
+      border-bottom: 2px solid #000;
+      outline: none;
+      color: #007bff;
+      font-weight: bold;
     }
+
     .result {
-      font-size: 1.5rem;
       text-align: center;
-      margin-top: 20px;
+      font-size: 36px;
+      line-height: 1.5;
+      font-weight: bold;
     }
+
     .blue {
       color: #007bff;
     }
+
     .black {
       color: #000;
     }
@@ -50,76 +60,53 @@
 </head>
 <body>
   <h1>🏃‍♂ RUN</h1>
+
   <div class="container">
     <div class="row">
-      <input id="minutes" type="number" placeholder="мин" />
-      <input id="seconds" type="number" placeholder="сек" />
-      <input id="distance" type="number" placeholder="метры" />
-    </div>
-    <div class="row">
-      <input id="speed" type="number" placeholder="км/ч" />
+      <input id="minutes" type="number" value="4" />
+      <input id="seconds" type="number" value="15" />
+      <input id="distance" type="number" value="200" />
     </div>
 
     <div class="result">
-      <div><span class="blue" id="speedOut">-</span> <span class="black">км/ч</span></div>
-      <div><span class="blue" id="paceOut">-</span> <span class="black">мин/км</span></div>
+      <div><span class="blue" id="speedOut">–</span> <span class="black">км/ч</span></div>
+      <div><span class="blue" id="paceOut">–</span> <span class="black">мин/км</span></div>
     </div>
   </div>
 
   <script>
-    const minutes = document.getElementById("minutes");
-    const seconds = document.getElementById("seconds");
-    const distance = document.getElementById("distance");
-    const speed = document.getElementById("speed");
-    const speedOut = document.getElementById("speedOut");
-    const paceOut = document.getElementById("paceOut");
+    var minutes = document.getElementById("minutes");
+    var seconds = document.getElementById("seconds");
+    var distance = document.getElementById("distance");
+    var speedOut = document.getElementById("speedOut");
+    var paceOut = document.getElementById("paceOut");
 
     function updateFromTime() {
-      const min = parseFloat(minutes.value) || 0;
-      const sec = parseFloat(seconds.value) || 0;
-      const dist = parseFloat(distance.value);
+      var min = parseFloat(minutes.value) || 0;
+      var sec = parseFloat(seconds.value) || 0;
+      var dist = parseFloat(distance.value);
 
       if (dist > 0 && (min > 0 || sec > 0)) {
-        const totalSeconds = min * 60 + sec;
-        const hours = totalSeconds / 3600;
-        const km = dist / 1000;
-        const kmph = km / hours;
-        const paceSecPerKm = totalSeconds / km;
-        const paceMin = Math.floor(paceSecPerKm / 60);
-        const paceSec = Math.round(paceSecPerKm % 60).toString().padStart(2, "0");
+        var totalSeconds = min * 60 + sec;
+        var hours = totalSeconds / 3600;
+        var km = dist / 1000;
+        var kmph = km / hours;
+        var paceSecPerKm = totalSeconds / km;
+        var paceMin = Math.floor(paceSecPerKm / 60);
+        var paceSec = Math.round(paceSecPerKm % 60).toString().padStart(2, "0");
 
-        speed.value = kmph.toFixed(1);
-        speedOut.textContent = kmph.toFixed(1);
-        paceOut.textContent = ${paceMin}.${paceSec};
+        speedOut.innerText = kmph.toFixed(1);
+        paceOut.innerText = paceMin + "." + paceSec;
       }
     }
 
-    function updateFromSpeed() {
-      const kmph = parseFloat(speed.value);
-      const dist = parseFloat(distance.value);
+    minutes.addEventListener("input", updateFromTime);
+    seconds.addEventListener("input", updateFromTime);
+    distance.addEventListener("input", updateFromTime);
 
-      if (kmph > 0 && dist > 0) {
-        const km = dist / 1000;
-        const hours = km / kmph;
-        const totalSeconds = hours * 3600;
-        const min = Math.floor(totalSeconds / 60);
-        const sec = Math.round(totalSeconds % 60);
-
-        minutes.value = min;
-        seconds.value = sec;
-
-        speedOut.textContent = kmph.toFixed(1);
-        const paceSecPerKm = 3600 / kmph;
-        const paceMin = Math.floor(paceSecPerKm / 60);
-        const paceSec = Math.round(paceSecPerKm % 60).toString().padStart(2, "0");
-        paceOut.textContent = ${paceMin}.${paceSec};
-      }
-    }
-
-    [minutes, seconds, distance].forEach(input =>
-      input.addEventListener("input", updateFromTime)
-    );
-    speed.addEventListener("input", updateFromSpeed);
+    window.addEventListener("DOMContentLoaded", function () {
+      updateFromTime();
+    });
   </script>
 </body>
 </html>
