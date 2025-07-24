@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор бега</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e8f4fc;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .result h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            text-align: center;
+        }
+        
+        .result-item {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .result-value {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .error {
+            color: #e74c3c;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Калькулятор бега</h1>
+        
+        <div class="input-group">
+            <label for="time">Введите время на 1 км (мм:сс):</label>
+            <input type="text" id="time" placeholder="Например: 05:30">
+            <div id="time-error" class="error">Пожалуйста, введите время в формате мм:сс (например 05:30)</div>
+        </div>
+        
+        <button onclick="calculate()">Рассчитать</button>
+        
+        <div id="result" class="result">
+            <h2>Результаты</h2>
+            <div class="result-item">
+                Ваш темп: <span id="pace" class="result-value"></span> мин/км
+            </div>
+            <div class="result-item">
+                Ваша скорость: <span id="speed" class="result-value"></span> км/ч
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // Получаем введенное время
+            const timeInput = document.getElementById('time').value.trim();
+            const errorElement = document.getElementById('time-error');
+            const resultElement = document.getElementById('result');
+            
+            // Проверяем формат ввода
+            const timeRegex = /^(\d{1,2}):(\d{2})$/;
+            if (!timeRegex.test(timeInput)) {
+                errorElement.style.display = 'block';
+                resultElement.style.display = 'none';
+                return;
+            }
+            
+            // Если формат правильный, скрываем сообщение об ошибке
+            errorElement.style.display = 'none';
+            
+            // Разбиваем время на минуты и секунды
+            const [minutesStr, secondsStr] = timeInput.split(':');
+            const minutes = parseInt(minutesStr);
+            const seconds = parseInt(secondsStr);
+            
+            // Проверяем корректность секунд (не больше 59)
+            if (seconds >= 60) {
+                errorElement.textContent = 'Секунды не могут быть больше 59';
+                errorElement.style.display = 'block';
+                resultElement.style.display = 'none';
+                return;
+            }
+            
+            // Рассчитываем общее время в секундах
+            const totalSeconds = minutes * 60 + seconds;
+            
+            // Рассчитываем темп (уже введен как время на 1 км)
+            const paceMinutes = Math.floor(totalSeconds / 60);
+            const paceSeconds = totalSeconds % 60;
+            const paceFormatted = `${paceMinutes}:${paceSeconds.toString().padStart(2, '0')}`;
+            
+            // Рассчитываем скорость в км/ч
+            const speed = (3600 / totalSeconds).toFixed(2);
+            
+            // Выводим результаты
+            document.getElementById('pace').textContent = paceFormatted;
+            document.getElementById('speed').textContent = speed;
+            resultElement.style.display = 'block';
+        }
+        
+        // Добавляем обработчик события для кнопки, чтобы можно было нажимать Enter
+        document.getElementById('time').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                calculate();
+            }
+        });
+    </script>
+</body>
+</html>
