@@ -23,7 +23,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 30px;
+      gap: 20px;
       max-width: 100%;
     }
 
@@ -36,31 +36,35 @@
 
     .input-group {
       display: flex;
-      align-items: center;
-      gap: 6px;
+      align-items: flex-end;
+      gap: 0px;
       margin: 5px 0;
     }
 
     input {
-      font-size: 50px;
+      font-size: 55px;
       text-align: center;
       border: none;
       background: none;
       color: #007bff;
       font-weight: bold;
       outline: none;
-      width: 95px;
+      width: 100px;
     }
 
     input:placeholder-shown {
       color: #ccc;
     }
 
+    #distance {
+      width: 130px;
+    }
+
     .label {
       font-size: 24px;
       font-weight: bold;
       color: black;
-      margin-left: -4px;
+      margin-left: -10px;
     }
 
     .unit-button {
@@ -70,14 +74,15 @@
       background: none;
       border: none;
       cursor: pointer;
-      padding: 0;
+      padding-left: 5px;
     }
 
     .result {
       text-align: center;
       font-size: 30px;
-      line-height: 1.5;
+      line-height: 1.2;
       font-weight: bold;
+      margin-top: 20px;
     }
 
     .blue {
@@ -149,9 +154,12 @@
       const min = getInputValue(minutes);
       const sec = getInputValue(seconds);
       const distMeters = getDistanceInMeters();
+      const totalTime = min * 60 + sec;
+      const hasTime = min > 0 || sec > 0;
 
-      if (distMeters > 0 && (min > 0 || sec > 0)) {
-        const totalSeconds = min * 60 + sec;
+      // Расчёт по времени
+      if (distMeters > 0 && hasTime) {
+        const totalSeconds = totalTime;
         const hours = totalSeconds / 3600;
         const km = distMeters / 1000;
         const kmph = km / hours;
@@ -159,9 +167,26 @@
         const paceMin = Math.floor(paceSecPerKm / 60);
         const paceSec = Math.round(paceSecPerKm % 60).toString().padStart(2, "0");
 
-        speedOut.innerText = Math.round(kmph); // округляем
+        speedOut.innerText = Math.round(kmph);
         paceOut.innerText = `${paceMin}.${paceSec}`;
-      } else {
+      }
+
+      // Обратный расчёт: если нет времени, но задана скорость и дистанция
+      else if (distMeters > 0) {
+        const speed = parseFloat(speedOut.innerText);
+        if (!isNaN(speed) && speed > 0) {
+          const hours = (distMeters / 1000) / speed;
+          const totalSeconds = hours * 3600;
+          const minNew = Math.floor(totalSeconds / 60);
+          const secNew = Math.round(totalSeconds % 60);
+          minutes.value = minNew;
+          seconds.value = secNew;
+          paceOut.innerText = `${Math.floor(60 / speed)}.${Math.round((60 / speed % 1) * 60).toString().padStart(2, "0")}`;
+        }
+      }
+
+      // Если ничего нет — сброс
+      else {
         speedOut.innerText = "–";
         paceOut.innerText = "–";
       }
@@ -171,7 +196,7 @@
       const value = getInputValue(distance);
 
       if (currentUnit === "m") {
-        distance.value = String((value / 1000).toFixed(2)).replace(/\.00$/, "");
+        distance.value = String((value / 1000).toFixed(2)).replace(/\.00$/, "").substring(0, 4);
         currentUnit = "km";
         unitToggle.innerText = "км";
       } else {
@@ -183,13 +208,11 @@
       updateFromTime();
     }
 
-    // Обновление при вводе
     minutes.addEventListener("input", updateFromTime);
     seconds.addEventListener("input", updateFromTime);
     distance.addEventListener("input", updateFromTime);
     unitToggle.addEventListener("click", toggleUnit);
 
-    // Автоматический расчет при загрузке
     window.addEventListener("DOMContentLoaded", () => {
       updateFromTime();
     });
