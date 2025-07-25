@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RUN</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&display=swap" rel="stylesheet">   
+  
+        <title>RUN</title>
+
   <style>
     body {
       background: white;
@@ -13,9 +19,8 @@
     }
 
     h1 {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 20px;
+      font-size: 40px;
+      margin-bottom: 30px;
       text-align: center;
     }
 
@@ -23,8 +28,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 30px;
+      gap: 10px;
       max-width: 100%;
+      margin-top: 150px;
     }
 
     .row {
@@ -57,14 +63,14 @@
     }
 
 #distance {
-      width: 130px;
+      width: 180px;
     }
 
     .label {
       font-size: 24px;
       font-weight: bold;
       color: black;
-      margin-left: -4px;
+      margin-left: -15px;
     }
 
     .unit-button {
@@ -82,7 +88,7 @@
       font-size: 30px;
       line-height: 1.2;
       font-weight: bold;
-      margin-top: 50px;
+      margin-top: 100px;
     }
 
     .blue {
@@ -100,16 +106,16 @@
   </style>
 </head>
 <body>
-  <h1>🏃‍♂️ RUN</h1>
+  <h1>RUN</h1>
 
   <div class="container">
     <div class="row">
       <div class="input-group">
-        <input id="minutes" type="text" inputmode="numeric" pattern="\d*" value="4" placeholder="0" />
+        <input id="minutes" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
         <span class="label">мин</span>
       </div>
       <div class="input-group">
-        <input id="seconds" type="text" inputmode="numeric" pattern="\d*" value="15" placeholder="0" />
+        <input id="seconds" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
         <span class="label">с</span>
       </div>
     </div>
@@ -130,6 +136,75 @@
       </div>
     </div>
   </div>
+    
+
+    <!-- Деление времени -->
+  <div class="container">
+    <h2>Деление</h2>
+    <div class="row">
+      <div class="input-group">
+        <input id="calcMin" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
+        <span class="label">мин</span>
+      </div>
+      <div class="input-group">
+        <input id="calcSec" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
+        <span class="label">с</span>
+      </div>
+      <div class="input-group">
+        <input id="divider" type="text" inputmode="decimal" pattern="\d*" value="2" placeholder="1" />
+        <span class="label">÷</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="input-group">
+        <input id="resultMin" type="text" readonly placeholder="0" />
+        <span class="label">мин</span>
+      </div>
+      <div class="input-group">
+        <input id="resultSec" type="text" readonly placeholder="0" />
+        <span class="label">с</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Вычитание времени -->
+  <div class="container">
+    <h2>Вычитание</h2>
+    <div class="row">
+      <div class="input-group">
+        <input id="subMin1" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
+        <span class="label">мин</span>
+      </div>
+      <div class="input-group">
+        <input id="subSec1" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
+        <span class="label">с</span>
+      </div>
+    </div>
+    <div class="row" style="font-size: 30px;">–</div>
+    <div class="row">
+      <div class="input-group">
+        <input id="subMin2" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
+        <span class="label">мин</span>
+      </div>
+      <div class="input-group">
+        <input id="subSec2" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
+        <span class="label">с</span>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 20px;">
+      <div class="input-group">
+        <input id="subResultMin" type="text" readonly placeholder="0" />
+        <span class="label">мин</span>
+      </div>
+      <div class="input-group">
+        <input id="subResultSec" type="text" readonly placeholder="0" />
+        <span class="label">с</span>
+      </div>
+    </div>
+  </div>
+
 
   <script>
     const minutes = document.getElementById("minutes");
@@ -198,6 +273,72 @@
     window.addEventListener("DOMContentLoaded", () => {
       updateFromTime();
     });
+
+        // Деление времени
+    const calcMin = document.getElementById("calcMin");
+    const calcSec = document.getElementById("calcSec");
+    const divider = document.getElementById("divider");
+    const resultMin = document.getElementById("resultMin");
+    const resultSec = document.getElementById("resultSec");
+
+    function updateTimeDivision() {
+      const min = parseInt(calcMin.value) || 0;
+      const sec = parseInt(calcSec.value) || 0;
+      const div = parseFloat(divider.value);
+
+      if (div > 0) {
+        const totalSec = min * 60 + sec;
+        const divided = totalSec / div;
+        const newMin = Math.floor(divided / 60);
+        const newSec = Math.round(divided % 60);
+
+        resultMin.value = newMin > 0 ? newMin : "";
+        resultSec.value = newSec > 0 ? newSec : "";
+        resultMin.placeholder = "0";
+        resultSec.placeholder = "0";
+      } else {
+        resultMin.value = "";
+        resultSec.value = "";
+      }
+    }
+
+    [calcMin, calcSec, divider].forEach(el =>
+      el.addEventListener("input", updateTimeDivision)
+    );
+
+    // Вычитание времени
+    const subMin1 = document.getElementById("subMin1");
+    const subSec1 = document.getElementById("subSec1");
+    const subMin2 = document.getElementById("subMin2");
+    const subSec2 = document.getElementById("subSec2");
+    const subResultMin = document.getElementById("subResultMin");
+    const subResultSec = document.getElementById("subResultSec");
+
+    function updateTimeSubtraction() {
+      const min1 = parseInt(subMin1.value) || 0;
+      const sec1 = parseInt(subSec1.value) || 0;
+      const min2 = parseInt(subMin2.value) || 0;
+      const sec2 = parseInt(subSec2.value) || 0;
+
+      const total1 = min1 * 60 + sec1;
+      const total2 = min2 * 60 + sec2;
+
+      let diff = total1 - total2;
+      if (diff < 0) diff = 0;
+
+      const newMin = Math.floor(diff / 60);
+      const newSec = Math.round(diff % 60);
+
+      subResultMin.value = newMin > 0 ? newMin : "";
+      subResultSec.value = newSec > 0 ? newSec : "";
+      subResultMin.placeholder = "0";
+      subResultSec.placeholder = "0";
+    }
+
+    [subMin1, subSec1, subMin2, subSec2].forEach(el =>
+      el.addEventListener("input", updateTimeSubtraction)
+    );
+
   </script>
 </body>
 </html>
