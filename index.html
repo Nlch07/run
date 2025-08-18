@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&display=swap" rel="stylesheet">   
-  
-        <title>RUN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&display=swap" rel="stylesheet">   
+  <title>RUN</title>
 
   <style>
     body {
@@ -62,7 +60,7 @@
       color: #ccc;
     }
 
-#distance {
+    #distance {
       width: 180px;
     }
 
@@ -103,12 +101,108 @@
       position: relative;
       top: -10px;
     }
+
+    .burger-menu {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+
+    .burger-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .burger-line {
+      width: 30px;
+      height: 3px;
+      background: #007bff;
+      transition: all 0.3s;
+    }
+
+    .menu-items {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 38%; /* На всю ширину экрана */
+      height: 100vh; /* На всю высоту экрана */
+      background: white;
+      transform: translateX(-100%); /* Скрыто за левым краем */
+      transition: transform 0.3s ease;
+      padding-top: 80px; /* Отступ для бургера */
+      box-sizing: border-box;
+    }
+
+        .menu-items.show {
+      transform: translateX(0); /* Показываем меню */
+    }
+
+    /* Анимация бургера в "крестик" */
+    .burger-btn.active .burger-line:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    .burger-btn.active .burger-line:nth-child(2) {
+      opacity: 0;
+    }
+    .burger-btn.active .burger-line:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+  }
+
+    .menu-items.show {
+      display: block;
+    }
+
+    .menu-item {
+      padding: 15px 30px;
+      font-size: 18px;
+      color: #333;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .menu-item:hover {
+      background: #f0f0f0;
+    }
+
+    .menu-item.active {
+      background: #007bff;
+      color: white;
+    }
+
+    /* Скрытые контейнеры */
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
+  <div class="burger-menu">
+    <button class="burger-btn" id="burgerBtn">
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+      <span class="burger-line"></span>
+    </button>
+    <div class="menu-items" id="menuItems">
+      <div class="menu-item active" data-mode="speed">Скорость</div>
+      <div class="menu-item" data-mode="divide">Деление</div>
+      <div class="menu-item" data-mode="subtract">Вычитание</div>
+    </div>
+  </div>
+
   <h1>RUN</h1>
 
-  <div class="container">
+  <!-- Контейнер скорости (по умолчанию видим) -->
+  <div class="container" id="speedContainer">
     <div class="row">
       <div class="input-group">
         <input id="minutes" type="text" inputmode="numeric" pattern="\d*" placeholder="0" />
@@ -137,9 +231,8 @@
     </div>
   </div>
     
-
-    <!-- Деление времени -->
-  <div class="container">
+  <!-- Контейнер деления (изначально скрыт) -->
+  <div class="container hidden" id="divideContainer">
     <h2>Деление</h2>
     <div class="row">
       <div class="input-group">
@@ -168,8 +261,8 @@
     </div>
   </div>
 
-  <!-- Вычитание времени -->
-  <div class="container">
+  <!-- Контейнер вычитания (изначально скрыт) -->
+  <div class="container hidden" id="subtractContainer">
     <h2>Вычитание</h2>
     <div class="row">
       <div class="input-group">
@@ -205,8 +298,55 @@
     </div>
   </div>
 
-
   <script>
+    // Управление бургер-меню
+    const burgerBtn = document.getElementById("burgerBtn");
+    const menuItems = document.getElementById("menuItems");
+    
+    burgerBtn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      menuItems.classList.toggle("show");
+    });
+    
+    document.addEventListener("click", function() {
+      menuItems.classList.remove("show");
+    });
+    
+    // Переключение между режимами
+    const menuOptions = document.querySelectorAll(".menu-item");
+    const speedContainer = document.getElementById("speedContainer");
+    const divideContainer = document.getElementById("divideContainer");
+    const subtractContainer = document.getElementById("subtractContainer");
+    
+    menuOptions.forEach(option => {
+      option.addEventListener("click", function() {
+        const mode = this.getAttribute("data-mode");
+        
+        // Убираем активный класс у всех пунктов
+        menuOptions.forEach(item => item.classList.remove("active"));
+        // Добавляем активный класс текущему пункту
+        this.classList.add("active");
+        
+        // Скрываем все контейнеры
+        speedContainer.classList.add("hidden");
+        divideContainer.classList.add("hidden");
+        subtractContainer.classList.add("hidden");
+        
+        // Показываем выбранный контейнер
+        if (mode === "speed") {
+          speedContainer.classList.remove("hidden");
+        } else if (mode === "divide") {
+          divideContainer.classList.remove("hidden");
+        } else if (mode === "subtract") {
+          subtractContainer.classList.remove("hidden");
+        }
+        
+        // Закрываем меню
+        menuItems.classList.remove("show");
+      });
+    });
+
+    // Калькулятор скорости
     const minutes = document.getElementById("minutes");
     const seconds = document.getElementById("seconds");
     const distance = document.getElementById("distance");
@@ -274,7 +414,7 @@
       updateFromTime();
     });
 
-        // Деление времени
+    // Деление времени
     const calcMin = document.getElementById("calcMin");
     const calcSec = document.getElementById("calcSec");
     const divider = document.getElementById("divider");
@@ -338,7 +478,6 @@
     [subMin1, subSec1, subMin2, subSec2].forEach(el =>
       el.addEventListener("input", updateTimeSubtraction)
     );
-
   </script>
 </body>
 </html>
